@@ -35,20 +35,20 @@ func BytesToBits(bytes *[]byte) *[]uint8 {
 }
 
 // BitsToBytes converts a slice of individual bits into a slice of bytes, effectively compressing them together.
-func BitsToBytes(bits *[]uint8) *[]byte {
-	numBytes := len(*bits) / bitsPerByte
-	if len(*bits) % bitsPerByte != 0 {
+func BitsToBytes(bits []uint8) *[]byte {
+	numBytes := len(bits) / bitsPerByte
+	if len(bits) % bitsPerByte != 0 {
 		numBytes++
 	}
+
+	// Zero-pad the beginning of the array if the number of bits is not a multiple of 8
+	extraBits := make([]uint8, len(bits) % bitsPerByte)
+	bits = append(extraBits, bits...)
+	
 	bytes := make([]byte, numBytes)
 	for i := 0; i < numBytes; i++ {
 		for j := 0; j < bitsPerByte; j++ {
-			//bits[i * bitsPerByte + j] = uint8(ReadFrom(uint16(bytes[i]), uint8(bitsPerByte - j - 1), 1))
-			// Zero-pad the beginning of the array if the number of bits is not a multiple of 8
-			if i == 0 && j < len(*bits) % bitsPerByte {
-				continue
-			}
-			bytes[i] = byte(WriteTo(uint16(bytes[i]), uint8(bitsPerByte - j - 1), 1, uint16((*bits)[i * bitsPerByte + j])))
+			bytes[i] = byte(WriteTo(uint16(bytes[i]), uint8(bitsPerByte - j - 1), 1, uint16(bits[i * bitsPerByte + j])))
 		}
 	}
 	return &bytes
