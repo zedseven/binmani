@@ -24,17 +24,18 @@ func WriteTo(data uint16, index, size uint8, value uint16) uint16 {
 }
 
 // BytesToBits converts a byte slice to a slice of each individual bit of the bytes.
-func BytesToBits(bytes *[]byte) *[]uint8 {
-	bits := make([]uint8, len(*bytes) * bitsPerByte)
-	for i := 0; i < len(*bytes); i++ {
+func BytesToBits(bytes []byte) *[]uint8 {
+	bits := make([]uint8, len(bytes) * bitsPerByte)
+	for i := 0; i < len(bytes); i++ {
 		for j := 0; j < bitsPerByte; j++ {
-			bits[i * bitsPerByte + j] = uint8(ReadFrom(uint16((*bytes)[i]), uint8(bitsPerByte - j - 1), 1))
+			bits[i * bitsPerByte + j] = uint8(ReadFrom(uint16(bytes[i]), uint8(bitsPerByte - j - 1), 1))
 		}
 	}
 	return &bits
 }
 
 // BitsToBytes converts a slice of individual bits into a slice of bytes, effectively compressing them together.
+// padStart specifies whether to pad the start or end of the slice, if the length is not a multiple of 8.
 func BitsToBytes(bits []uint8, padStart bool) *[]byte {
 	numBytes := len(bits) / bitsPerByte
 	if len(bits) % bitsPerByte != 0 {
